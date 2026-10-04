@@ -111,7 +111,7 @@ def main():
     try:
         pygame.mixer.init()
         pygame.mixer.music.load("love_you.mp3")
-        pygame.mixer.music.play()
+        pygame.mixer.music.play(-1)
     except pygame.error as error:
         print(f"Audio unavailable; continuing without music: {error}")
 
