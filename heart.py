@@ -108,9 +108,12 @@ def draw_glow_text(glow_layer, screen_layer, font, word, color, x, y, alpha, siz
 def main():
     pygame.init()
 
-    pygame.mixer.init()
-    pygame.mixer.music.load("love_you.mp3")
-    pygame.mixer.music.play()
+    try:
+        pygame.mixer.init()
+        pygame.mixer.music.load("love_you.mp3")
+        pygame.mixer.music.play()
+    except pygame.error as error:
+        print(f"Audio unavailable; continuing without music: {error}")
 
     screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.DOUBLEBUF)
     pygame.display.set_caption("I love you <3")
