@@ -110,28 +110,6 @@
       outline-offset: 3px;
     }
 
-    #music-toggle {
-      display: inline-flex;
-      align-items: center;
-      gap: 9px;
-      min-width: 138px;
-      justify-content: center;
-      color: #061117;
-      background: var(--ice);
-    }
-
-    #music-toggle:hover {
-      border-color: transparent;
-      background: #a0ddf8;
-    }
-
-    .symbol {
-      width: 16px;
-      font-size: 14px;
-      line-height: 1;
-      text-align: center;
-    }
-
     #replay {
       display: grid;
       width: 42px;
@@ -173,10 +151,6 @@
   </main>
 
   <div class="controls" aria-label="Animation controls">
-    <button id="music-toggle" type="button" aria-label="Play music" aria-pressed="false">
-      <span class="symbol" aria-hidden="true">▶</span>
-      <span class="button-label">Play music</span>
-    </button>
     <button id="replay" type="button" aria-label="Replay animation" title="Replay animation">↻</button>
   </div>
 
@@ -190,9 +164,6 @@
       const canvas = document.querySelector("#scene");
       const context = canvas.getContext("2d");
       const audio = document.querySelector("#music");
-      const musicToggle = document.querySelector("#music-toggle");
-      const musicSymbol = musicToggle.querySelector(".symbol");
-      const musicLabel = musicToggle.querySelector(".button-label");
       const replayButton = document.querySelector("#replay");
       const words = ["love you", "Love You", "LOVE YOU"];
       const colors = ["#4682b4", "#1e90ff", "#00bfff", "#6495ed", "#4169e1"];
@@ -346,33 +317,19 @@
         requestAnimationFrame(animate);
       }
 
-      function syncMusicButton() {
-        const isPlaying = !audio.paused;
-        musicSymbol.textContent = isPlaying ? "Ⅱ" : "▶";
-        musicLabel.textContent = isPlaying ? "Pause music" : "Play music";
-        musicToggle.setAttribute("aria-label", isPlaying ? "Pause music" : "Play music");
-        musicToggle.setAttribute("aria-pressed", String(isPlaying));
+      function startMusic() {
+        if (audio.paused) audio.play().catch(() => {});
       }
 
-      musicToggle.addEventListener("click", async () => {
-        if (audio.paused) {
-          try {
-            await audio.play();
-          } catch (error) {
-            musicLabel.textContent = "Audio unavailable";
-            musicToggle.setAttribute("aria-label", "Audio unavailable");
-          }
-        } else {
-          audio.pause();
-        }
-        syncMusicButton();
-      });
+      function removeMusicGestureListeners() {
+        document.removeEventListener("pointerdown", startMusic);
+        document.removeEventListener("keydown", startMusic);
+      }
 
-      audio.addEventListener("play", syncMusicButton);
-      audio.addEventListener("pause", syncMusicButton);
-      audio.play().catch(() => {
-        syncMusicButton();
-      });
+      audio.addEventListener("play", removeMusicGestureListeners, { once: true });
+      document.addEventListener("pointerdown", startMusic);
+      document.addEventListener("keydown", startMusic);
+      startMusic();
       replayButton.addEventListener("click", () => {
         startTime = performance.now();
         lastTime = startTime;
